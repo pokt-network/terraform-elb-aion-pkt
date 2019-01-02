@@ -1,0 +1,101 @@
+  {
+  "AWSEBDockerrunVersion": 2,
+
+    "volumes": [
+
+     {
+       "name": "aion-mastery-vol",
+       "host": {
+         "sourcePath": "/var/app/mastery"
+       }
+     },
+
+     {
+       "name": "node-exporter-proc",
+       "host": {
+         "sourcePath": "/proc"
+       }
+     },
+     {
+       "name": "node-exporter-sys",
+       "host": {
+         "sourcePath": "/sys"
+       }
+     },
+     {
+       "name": "node-exporter-rootfs",
+       "host": {
+         "sourcePath": "/"
+       }
+     }
+   ],
+
+   "containerDefinitions": [
+   {
+
+     "image": "sh39sxn/aion-kernel",
+     "name": "aion-mastery",
+     "essential": true,
+
+     "mountPoints": [
+       {
+         "sourceVolume": "aion-mastery-vol",
+         "containerPath": "/etc/.mastery",
+         "readOnly": true
+       }
+     ],
+
+     "Ports": [
+       {
+         "ContainerPort": "8545"
+       },
+       {
+         "ContainerPort": "8547"
+       },
+       {
+         "ContainerPort": "30303"
+       }
+     ],
+     "memory": 4096,
+     "cpu": 512,
+     "Logging": "/var/log/aion"
+   },
+
+   {
+
+     "image": "prom/node-exporter:v0.15.0",
+     "name": "node-exporter",
+     "essential": true,
+
+     "mountPoints": [
+       {
+         "sourceVolume": "node-exporter-proc",
+         "containerPath": "/host/proc",
+         "readOnly": true
+       },
+       {
+         "sourceVolume": "node-exporter-sys",
+         "containerPath": "/host/sys",
+         "readOnly": true
+       },
+       {
+         "sourceVolume": "node-exporter-rootfs",
+         "containerPath": "/rootfs",
+         "readOnly": true
+       }
+
+     ],
+
+     "Ports": [
+       {
+         "ContainerPort": "9100"
+       }
+     ],
+     "memory": 1024,
+     "cpu": 128,
+     "Logging": "/var/log/node-exporter"
+   }
+
+
+  ]
+}

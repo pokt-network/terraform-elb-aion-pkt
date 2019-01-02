@@ -1,0 +1,19 @@
+branch-defaults:
+  default:
+    environment: aio-mainnet-node-prod-1
+  feature/expanded-storage:
+    environment: null
+    group_suffix: null
+  feature/multi-docker:
+    environment: aio-mainnet-node-prod-1
+  master:
+    environment: aio-mainnet-node-prod-1
+  staging:
+    environment: aio-mainnet-node-prod-1
+global:
+  application_name: aion-mainnet-node
+  artifact: deploy.zip
+  branch: master
+  default_region: us-east-1
+  repository: null
+  sc: git

@@ -1,0 +1,15 @@
+branch-defaults:
+  feature/expanded-storage:
+    environment: null
+    group_suffix: null
+  master:
+    environment: pocket-prod 
+  staging:
+    environment: pocket-staging 
+global:
+  application_name: pocket
+  artifact: deploy.zip
+  branch: master
+  default_region: us-east-1
+  repository: null
+  sc: git

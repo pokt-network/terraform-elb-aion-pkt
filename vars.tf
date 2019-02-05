@@ -10,22 +10,19 @@ variable "aws_region" {
 
 variable "public_keypair" {
   type = "string"
-  default = "ssh-rsa xxx"
+  default = "ssh-rsa xxxx"
 }
 
 variable "notify_email" {
   type = "string"
-  default = "infrastructure@pokt.network"
 }
 
 variable "environment" {
   type = "string"
-  default = "prod"
 }
 
 variable "create_bastion" {
   type = "string"
-  default = "no"
 }
 
 
@@ -36,12 +33,12 @@ variable "pocket_instancetype" {
 
 variable "node_instancetype" {
   type = "string"
-  default = "t3.large"
+  default = "t3.xlarge"
 }
 
 variable "platform" {
   type = "string"
-  default = "64bit Amazon Linux 2018.03 v2.11.6 running Multi-container Docker 18.06.1-ce (Generic)" 
+  default = "64bit Amazon Linux 2018.03 v2.11.7 running Multi-container Docker 18.06.1-ce (Generic)" 
 
 }
 
@@ -49,4 +46,7 @@ variable "bastion_ami" {
   type = "string"
   default = "ami-02a332807adca7555"
 
+#  us-east-2: ami-d54378b0
+#  us-east-1: ami-02a332807adca7555
+#  us-west-1: ami-d54378b0
 }

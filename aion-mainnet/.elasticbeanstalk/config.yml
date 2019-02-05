@@ -1,15 +1,15 @@
 branch-defaults:
   default:
-    environment: aio-mainnet-node-prod-1
+    environment: aion-mainnet-node-prod-1
   feature/expanded-storage:
     environment: null
     group_suffix: null
   feature/multi-docker:
-    environment: aio-mainnet-node-prod-1
+    environment: aion-mainnet-node-prod-1
   master:
     environment: aion-mastery-node-prod
   staging:
-    environment: aio-mainnet-node-prod-1
+    environment: aion-mainnet-node-prod-1
 global:
   application_name: aion-mainnet-node
   artifact: deploy.zip

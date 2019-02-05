@@ -1,12 +1,13 @@
 branch-defaults:
   master:
-    environment: aion-mastery-node-prod 
+    environment: null
+    group_suffix: null
   staging:
-    environment: aion-mastery-node-staging 
+    environment: aion-mastery-node-staging
 global:
   application_name: aion-mastery-node
+  artifact: deploy.zip
   branch: master
   default_region: us-east-1
-  artifact: deploy.zip
   repository: null
   sc: git

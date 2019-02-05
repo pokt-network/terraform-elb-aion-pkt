@@ -3,9 +3,10 @@ branch-defaults:
     environment: null
     group_suffix: null
   master:
-    environment: pocket-prod 
+    environment: null
+    group_suffix: null
   staging:
-    environment: pocket-staging 
+    environment: pocket-staging
 global:
   application_name: pocket
   artifact: deploy.zip

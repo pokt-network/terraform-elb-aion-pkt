@@ -33,31 +33,32 @@
    "containerDefinitions": [
    {
 
-     "image": "sh39sxn/aion-kernel",
+     "image": "poktnetwork/aion",
      "name": "aion-mainnet",
      "essential": true,
 
      "mountPoints": [
        {
          "sourceVolume": "aion-mainnet-vol",
-         "containerPath": "/etc/.mainnet",
-         "readOnly": true
+         "containerPath": "/opt/aion/mainnet"
+
        }
      ],
 
-     "Ports": [
+     "portMappings": [
        {
-         "ContainerPort": "8545"
+         "hostPort": 80,
+         "containerPort": 8545
        },
        {
-         "ContainerPort": "8547"
+         "containerPort": 8547
        },
        {
-         "ContainerPort": "30303"
+         "containerPort": 30303
        }
      ],
-     "memory": 4096,
-     "cpu": 512,
+     "memory": 10240,
+     "cpu": 2048,
      "Logging": "/var/log/aion"
    },
 

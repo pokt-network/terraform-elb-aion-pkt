@@ -221,6 +221,13 @@ resource "aws_elastic_beanstalk_environment" "aion-mastery-node-env" {
     name = "RootVolumeSize"
     value = "300"
   }
+  
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name = "RootVolumeType"
+    value = "gp2"
+  }
+
 
 }
 

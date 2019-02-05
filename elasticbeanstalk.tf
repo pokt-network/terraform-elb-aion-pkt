@@ -51,6 +51,7 @@ resource "aws_security_group" "aion-mastery" {
 resource "aws_elastic_beanstalk_environment" "aion-mastery-node-env" {
   name = "aion-mastery-node-${var.environment}"
   application = "${aws_elastic_beanstalk_application.aion-mainnet-node.name}"
+  version_label = "${aws_elastic_beanstalk_application_version.aion-mastery.name}"
   solution_stack_name = "${var.platform}"
   cname_prefix = "aion-mastery-node-${var.environment}"
   setting {
@@ -93,7 +94,7 @@ resource "aws_elastic_beanstalk_environment" "aion-mastery-node-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name = "IamInstanceProfile"
-    value = "app-ec2-role"
+    value = "app-ec2-role-${var.environment}-${var.aws_region}"
   }
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -228,6 +229,35 @@ resource "aws_elastic_beanstalk_environment" "aion-mastery-node-env" {
     value = "gp2"
   }
 
+# START: Application env variables
+
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "AION_NETWORK"
+    value = "mastery"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "apis_enabled"
+    value = "web3,net,personal,eth,stratum"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "java_api_listen_address"
+    value = "0.0.0.0"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "mining"
+    value = "false"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "rpc_listen_address"
+    value = "0.0.0.0"
+  }
+
+# END: Application env variables
 
 }
 
@@ -289,6 +319,7 @@ resource "aws_elastic_beanstalk_application" "aion-mainnet-node" {
 resource "aws_elastic_beanstalk_environment" "aion-mainnet-node-env" {
   name = "${aws_elastic_beanstalk_application.aion-mainnet-node.name}-${var.environment}"
   application = "${aws_elastic_beanstalk_application.aion-mainnet-node.name}"
+  version_label = "${aws_elastic_beanstalk_application_version.aion-mainnet.name}"
   solution_stack_name = "${var.platform}"
   cname_prefix = "${aws_elastic_beanstalk_application.aion-mainnet-node.name}-${var.environment}"
   setting {
@@ -331,7 +362,7 @@ resource "aws_elastic_beanstalk_environment" "aion-mainnet-node-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name = "IamInstanceProfile"
-    value = "app-ec2-role"
+    value = "app-ec2-role-${var.environment}-${var.aws_region}"
   }
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -460,6 +491,36 @@ resource "aws_elastic_beanstalk_environment" "aion-mainnet-node-env" {
     value = "300"
   }
 
+# START: Application env variables
+
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "AION_NETWORK"
+    value = "mainnet"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "apis_enabled"
+    value = "web3,net,personal,eth,stratum"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "java_api_listen_address"
+    value = "0.0.0.0"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "mining"
+    value = "false"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "rpc_listen_address"
+    value = "0.0.0.0"
+  }
+
+# END: Application env variables
+
 }
 
 ########################################## POCKET NODE ELB ################################
@@ -501,8 +562,6 @@ resource "aws_elastic_beanstalk_application" "pocket-node" {
   name = "pocket"
   description = "pocket-node-application"
 
-  
-
 }
 
 resource "aws_elastic_beanstalk_environment" "pocket-node-env" {
@@ -511,6 +570,7 @@ resource "aws_elastic_beanstalk_environment" "pocket-node-env" {
 
   name = "${aws_elastic_beanstalk_application.pocket-node.name}-${var.environment}"
   application = "${aws_elastic_beanstalk_application.pocket-node.name}"
+  version_label = "${aws_elastic_beanstalk_application_version.pocket.name}"
   solution_stack_name = "${var.platform}"
   cname_prefix = "${aws_elastic_beanstalk_application.pocket-node.name}-${var.environment}"
   
@@ -532,7 +592,7 @@ resource "aws_elastic_beanstalk_environment" "pocket-node-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name = "IamInstanceProfile"
-    value = "app-ec2-role"
+    value = "app-ec2-role-${var.environment}-${var.aws_region}"
   }
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -674,37 +734,36 @@ resource "aws_elastic_beanstalk_environment" "pocket-node-env" {
     value = "enhanced"
   }
 
-
-# ENV VARIABLES:
-  setting {   
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name = "POCKET_NODE_PLUGIN_AION_TESTNET_NODE"
-    value = "http://${aws_elastic_beanstalk_environment.aion-mastery-node-env.cname}"
-  }
-
-  setting {   
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name = "POCKET_NODE_PLUGIN_AION_MAINNET_NODE"
-    value = "http://${aws_elastic_beanstalk_environment.aion-mainnet-node-env.cname}"
-  }
- 
-
-  setting {   
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name = "POCKET_NODE_PLUGIN_AION_TEST_NETWORK_ID"
-    value = "4"
-  }
-  
-  setting {   
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name = "POCKET_NODE_PLUGIN_AION_MAIN_NETWORK_ID"
-    value = "1"
-  }
-
   setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name = "HealthCheckPath"
     value = "/node/"
   }
 
+# START: Application env variables
+  
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "POCKET_NODE_PLUGIN_AION_MAIN_NETWORK_ID"
+    value = "256"
+  }
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "POCKET_NODE_PLUGIN_AION_MAIN_NODE"
+    value = "http://${aws_elastic_beanstalk_environment.aion-mainnet-node-env.cname}"
+  }
+
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "POCKET_NODE_PLUGIN_AION_TEST_NETWORK_ID"
+    value = "32"
+  }
+  
+  setting {   
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name = "POCKET_NODE_PLUGIN_AION_TESTNET_NODE"
+    value = "http://${aws_elastic_beanstalk_environment.aion-mastery-node-env.cname}"
+  }
 }
+# END: Application env variables
+

@@ -7,7 +7,7 @@ branch-defaults:
   feature/multi-docker:
     environment: aio-mainnet-node-prod-1
   master:
-    environment: aio-mainnet-node-prod-1
+    environment: aion-mastery-node-prod
   staging:
     environment: aio-mainnet-node-prod-1
 global:

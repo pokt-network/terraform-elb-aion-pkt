@@ -1,16 +1,86 @@
+
  {
-   "AWSEBDockerrunVersion": "1",
-   "Image": {
-     "Name": "poktnetwork/pocket-node:aion",
-     "Update": "true"
-   },
-   "Ports": [
+  "AWSEBDockerrunVersion": 2,
+
+    "volumes": [    
      {
-       "ContainerPort": "3000"
+       "name": "node-exporter-proc",
+       "host": {
+         "sourcePath": "/proc"
+       }
      },
      {
-       "ContainerPort": "5800"
+       "name": "node-exporter-sys",
+       "host": {
+         "sourcePath": "/sys"
+       }
+     },
+     {
+       "name": "node-exporter-rootfs",
+       "host": {
+         "sourcePath": "/"
+       }
      }
    ],
-   "Logging": "/var/log/nginx"
+
+   "containerDefinitions": [
+   {
+
+     "image": "poktnetwork/pocket-node:aion",
+     "name": "pocket-aion",
+     "essential": true,
+
+     "portMappings": [
+       {
+         "hostPort": 80,
+         "containerPort": 3000
+       },
+       {
+	 "hostPort": 5800,
+         "containerPort": 5800
+       }
+     
+     ],
+     "memory": 1024,
+     "cpu": 256,
+     "Logging": "/var/log/pocket"
+   },
+
+   {
+
+     "image": "prom/node-exporter:v0.15.0",
+     "name": "node-exporter",
+     "essential": true,
+
+     "mountPoints": [
+       {
+         "sourceVolume": "node-exporter-proc",
+         "containerPath": "/host/proc",
+         "readOnly": true
+       },
+       {
+         "sourceVolume": "node-exporter-sys",
+         "containerPath": "/host/sys",
+         "readOnly": true
+       },
+       {
+         "sourceVolume": "node-exporter-rootfs",
+         "containerPath": "/rootfs",
+         "readOnly": true
+       }
+
+     ],
+
+     "Ports": [
+       {
+         "ContainerPort": "9100"
+       }
+     ],
+     "memory": 512,
+     "cpu": 128,
+     "Logging": "/var/log/node-exporter"
+   }
+
+
+  ]
 }

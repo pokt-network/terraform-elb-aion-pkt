@@ -1,4 +1,4 @@
-## Terraform ElasticBeanstalk with single docker container stack for GETH and Pocket 
+## Terraform ElasticBeanstalk with multi docker container stack for AION and Pocket 
 
 This terraform project creates the following resources in `us-east-1` in your AWS account:
 
@@ -7,19 +7,31 @@ This terraform project creates the following resources in `us-east-1` in your AW
 - 6 subnets (3 private and 3 public) [vpc_setup.tf](vpc_setup.tf)
 - 1 Internet Gateway and 1 NAT gateway for providing internet access to private instances ([vpc_setup.tf](vpc_setup.tf) and [nat.tf](nat.tf))
 - 3 Route tables [vpc_setup.tf](vpc_setup.tf)
-
-- 1 Unique keypair for the instances on the 2 ELB and bastion
+- 1 Unique keypair for the instances on the 3 ELB env and bastion instances
 - 2 Security groups for the instances in each of the ELBs
 - 2 ELB applications [elasticbeanstalk.tf](elasticbeanstalk.tf)
-- 2 ELB environments (Single container Docker) [elasticbeanstalk.tf](elasticbeanstalk.tf)
-  - 1 Internal LoadBalancer and t3.large instances for GETH nodes 
-  - 1 Public LoadBalancer and t3.small instances for Pocket nodes
+- 3 ELB environments (multi docker containers) [elasticbeanstalk.tf](elasticbeanstalk.tf)
+  - 2 ELB environments with Internal LoadBalancer and t3.xlarge instances for aion nodes 
+  - 1 ELB environment with Public LoadBalancer and t3.small instances for Pocket nodes
   - All ELB instances are behind private subnets
-  - Scaling groups with network rules
+  - Scaling groups has network rules
   - Enhanced Monitoring
   - Notifications to an specified email
+
+- 1 Bucket and 3 ELB application versions in order to directly deploy aion-mainnet, aion-mastery and pocket [bucket.tf](bucket.tf)
 - (Optional) Provides a bastion instance for the `main-public-1` subnet (in case you want to access the instances ) [elasticbeanstalk.tf](elasticbeanstalk.tf) 
 
+NOTE: You can customize the region as shown in customize section below. We just provided  this script with region `us-east-1` as default
+
+
+It also deploys the following applications on the ELB environments created:
+
+- [aion-mainnet aion](aion-mainnet/deploy.zip)
+- [aion-mastery](aion-mainnet/deploy.zip)
+- [pocket](pocket-node/deploy.zip)
+
+NOTE: You will see that we provide inside the `Dockerrun.aws.json` on the .zips  a node exporter (prom/node-exporter:v0.15.0) this is provided in case the person in question wants to extract analytics of the node using graphana for better monitoring 
+This specific docker configuration can be removed if needed
 
 ### Usage
 
@@ -47,14 +59,22 @@ For obtainning public ssh keys for the instances you should use:
 
 And copy the result inside the `default` value in the variable `public_keypair` on `vars.tf`
 
+If you need to customize this terraform setup, you can see more general aspects on `vars.tf`.
+
+In case you want to switch to another region. Take in count to change the AMI for the bastion instance and the availability zone, because those are values that change between regions.
+
+NOTE: in the `vars.tf` file you will find some of the bastion instance AMI ID commented so you can get those values from there. In the case of the availability zone values, it's just check if <region>-a, <region>-b, <region>-c are available, if not. Just replace then and use onlt the available ones per region
+
 
 ### Execute
 
 
-Then execute the plan using terraform:
+If you're all set, Then execute the plan using terraform:
+
 
 ```
-terraform plan   # to show the plan
+terraform plan   # to show the plan (All the changes that will be performed)
+
 terraform apply  # to apply the changes
 ```
 
@@ -72,55 +92,32 @@ In both commands, terraform will ask:
 
 ```
 
+After everything has been completed, go inside elasticbeanstalk in the region you run terraform and use the URL provided by elasticbeanstalk of the app pocket and check if AION it's working
 
-#### Deploying
 
-After we run our terraform script and checked that everything is running and the resources are created as expected. We will proceed to deploy the geth-mainnet and geth-testnet containers.
+#### Deploying aion-mainnet and aion-mastery applications versions manually 
 
+This step it's only for those who want to deploy manually aion-mainnet and aion-mastery maybe because changes on the application-version file or any other need
 
 We assume at this point that you have (awscli)[https://aws.amazon.com/cli/] and (awsebcli)[https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html] installed and configured correctly using a IAM user with permissions for deploying on ELB or just using your AWS access id keys and secret keys on the environment level of this user
 
 
-#### Deploying geth-mainnet
+> cd aion-mainnet
 
-
-> cd geth-mainnet
-
-
-> make deploy ENV=geth-mainnet-node-staging
-
+> make deploy ENV=aion-mainnet-node-staging
 
 Just replace `staging` with the environment that you deployed using terraform before
 
-The make command uses the Makefile for zipping the content of the folder `geth-mainnet` and deploying it in the ELB interface automatically.
+The make command uses the Makefile for zipping the content of the folder `aion-mainnet` and deploying it in the ELB interface automatically.
 
 For more information about configuration in Elasticbeanstalk. Please check this (link)[https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environment-configuration-methods-before.html]
 
-
-Once this is done, this will deploy to ELB and will create a docker container with geth configured for mainnet purposes. Also it will run the commands described in `.ebextensions/` in order to 
+Once this is done, this will deploy to ELB and will create a docker container with aion configured for mainnet purposes. Also it will run the commands described in `.ebextensions/` in order to 
 modify the storage of docker to overlay2 for using all the disk space in  the docker container and restart the docker daemon. For more information about the functionality of the ELB and other configurations please check (this)[https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html]
 
-If you see any issue while deploying your container, please check the `.elasticbeanstalk/config.yml` to see if everything matchs your configuration and if the script Makefile do what your setup expects. We are using basic configurations for deploying a simple geth container with no storage issues
+If you see any issue while deploying your container, please check the `.elasticbeanstalk/config.yml` to see if everything matchs your configuration and if the script Makefile do what your setup expects. 
 
-
-#### Deploying geth-testnet
-
-
-FOr deploying testnet is the same procedure as the step before
-
-
-> cd geth-testnet
-
-
-> make deploy ENV=geth-testnet-node-staging
-
-
-Replacing `staging` with the environment that you deployed using terraform before. 
-
-Please check the links in the `Deploying geth-mainnet` step for more info
-
-
-#### Deploying pocket-node 
+#### Deploying pocket-node manually
 
 
 FOr deploying pocket-node is the same procedure as the step before
@@ -135,8 +132,7 @@ FOr deploying pocket-node is the same procedure as the step before
 Replacing `staging` with the environment that you deployed using terraform before. 
 
 
-Please check the links in the `Deploying geth-mainnet` step for more info
-
+Please check the links in the `Deploying aion-mainnet` step for more info
 
 #### Customizing 
   

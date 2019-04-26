@@ -1,3 +1,6 @@
+# NOTE:
+This repository has been deprecated, please visit the [Pocket Core repository for the latest on Pocket development.](https://github.com/pokt-network/pocket-core)
+
 ## Terraform ElasticBeanstalk with multi docker container stack for AION and Pocket 
 
 This terraform project creates the following resources in `us-east-1` in your AWS account:
